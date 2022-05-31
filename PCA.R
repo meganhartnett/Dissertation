@@ -8,23 +8,39 @@ print(file)
 fname <- args[2]
 print(fname)
 plotname <- args[3]
+print(plotname)
 
+print("loading matrix....")
 library(Matrix)
+print("loading irlba...")
 library(irlba)
+print("loading ggfortify...")
 library(ggfortify)
 
-#p <- pipe("sed /^#/d $file  | cut -f '10-' | ./a.out | cut -f '1-2'")
+Sys.setenv(file=file)
+Sys.getenv("file")
+system("echo $file")
 
-#x <- read.table(p, colClasses=c("integer","integer"), fill=TRUE, row.names=NULL)
+p <- pipe("sed /^#/d $file | cut -f '10-' | ./a.out | cut -f '1-2'")
 
-#chr1 <- sparseMatrix(i=x[,2], j=x[,1], x=1.0)
-#print(dim(chr1))
+print(p)
 
-#p = prcomp_irlba(chr1, n=2)
-#print(summary(p))
+x <- read.table(p, colClasses=c("integer","integer"), fill=TRUE, row.names=NULL)
 
-#tiff(filename=paste(str(fname),".tiff"), units="in", width=8, height=8, res=300)
-#autoplot(p, main=str(plotname), label=TRUE) +
-#theme(plot.title = element_text(hjust = 0.5)) +
-#geom_point(colour="blue")
-#dev.off()
+head(x)
+
+chr1 <- sparseMatrix(i=x[,2], j=x[,1], x=1.0)
+print(dim(chr1))
+
+pc = prcomp_irlba(chr1, n=2)
+summary(pc)
+
+filename <- paste0(fname,".tiff")
+filename
+
+tiff(filename=paste0(fname,".tiff"), units="in", width=8, height=8, res=300)
+autoplot(pc, main=plotname, label=TRUE) +
+theme(plot.title = element_text(hjust = 0.5)) +
+geom_point(colour="blue")
+dev.off()
+
